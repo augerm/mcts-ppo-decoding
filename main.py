@@ -165,11 +165,13 @@ def demo(
     )
     newline = '\n'
     print("Detailed Log Probs:")
-    for item_list in detailed_logprobs:
-        for item in item_list:
-            print(f"{newline}{item[0]}: {item[1]}")
-        print(newline)
 
+    for sublist in detailed_logprobs:
+        for tup in sublist:
+            # Creating a string representation of each tuple
+            tup_str = ', '.join([str(elem) for elem in tup])
+            print(f"{newline}{tup_str}")
+        print(newline)  # Extra newline for separating between sublists
 
     if should_print:
         for x,l in zip(res, _logprobs):
