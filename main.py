@@ -7,6 +7,8 @@ from pathlib import Path
 
 from mistral.model import Transformer
 from mistral.tokenizer import Tokenizer
+from tree_search_decoding.mcts import mcts
+from tree_search_decoding.game_state import GameState
 
 
 def sample_top_p(probs: torch.Tensor, p: float):
@@ -32,7 +34,7 @@ def sample(logits: torch.Tensor, temperature: float, top_p: float):
 
 
 @torch.inference_mode()
-def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, max_tokens: int,  temperature: float, chunk_size: int = None):
+def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, max_tokens: int,  temperature: float, chunk_size: int = None, use_mcts_decoding: bool = False):
     model = model.eval()
     B, V = len(prompts), model.args.vocab_size
 
@@ -121,7 +123,7 @@ def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, ma
     return generated_words, logprobs, detailed_logprobs
 
 
-def interactive(model_path: str, max_tokens: int = 35, temperature: float = 0.7, instruct: bool = False):
+def interactive(model_path: str, max_tokens: int = 35, temperature: float = 0.7, instruct: bool = False, use_mcts_decoding: bool = False):
     tokenizer = Tokenizer(str(Path(model_path) / "tokenizer.model"))
     transformer = Transformer.from_folder(Path(model_path), max_batch_size=3)
 
@@ -135,13 +137,14 @@ def interactive(model_path: str, max_tokens: int = 35, temperature: float = 0.7,
             tokenizer,
             max_tokens=max_tokens,
             temperature=temperature,
+            use_mcts_decoding=use_mcts_decoding,
         )
         print(res[0])
         print("=====================")
 
 
 def demo(
-    model_path: str, max_tokens: int = 35, temperature: float = 0, num_pipeline_ranks=1
+    model_path: str, max_tokens: int = 35, temperature: float = 0, num_pipeline_ranks=1, use_mcts_decoding: bool = False
 ):
     if num_pipeline_ranks > 1:
         torch.distributed.init_process_group()
@@ -162,6 +165,7 @@ def demo(
         tokenizer,
         max_tokens=max_tokens,
         temperature=temperature,
+        use_mcts_decoding=use_mcts_decoding,
     )
     newline = '\n'
     print("Detailed Log Probs:")

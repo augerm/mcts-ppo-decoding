@@ -1,7 +1,7 @@
 import torch
 
 class GameState:
-    def __init__(self, model, tokenizer, sequence, temperature=0.7, top_k=5):
+    def __init__(self, model, policy_model, value_model, tokenizer, sequence, temperature=0.7, top_k=5):
         """
         Initialize the game state.
         :param model: The transformer model used for generating text.
@@ -15,23 +15,22 @@ class GameState:
         self.sequence = sequence
         self.temperature = temperature
         self.top_k = top_k
+        self.policy_model = policy_model
+        self.value_model = value_model
         self.player_to_move = 1  # Assuming a single-player setup
 
     def get_legal_actions(self):
-        """
-        Get top k tokens as legal actions based on the model's predictions.
-        """
-        # Convert the current sequence to a tensor and perform a forward pass through the model
         with torch.no_grad():
-            inputs = torch.tensor([self.sequence], dtype=torch.long, device=self.model.device)
-            logits = self.model.forward(inputs)[-1, :, :]  # Get logits for the last token in the sequence
-            # Apply temperature scaling
-            scaled_logits = logits / self.temperature
-            # Convert logits to probabilities
-            probs = torch.softmax(scaled_logits, dim=-1)
-            # Select the top k tokens based on their probabilities
-            top_probs, top_indices = torch.topk(probs, self.top_k, dim=-1)
+            inputs = torch.tensor([self.sequence], dtype=torch.long, device=self.policy_model.device)
+            action_probs = self.policy_model(inputs)  # Assuming the policy model outputs a probability distribution over actions
+            
+            # You might still want to apply temperature scaling or other adjustments here
+            action_probs = torch.softmax(action_probs / self.temperature, dim=-1)
+            
+            # Select the top k actions based on the policy model's probabilities
+            top_probs, top_indices = torch.topk(action_probs, self.top_k, dim=-1)
             return top_indices[0].cpu().tolist()
+
 
     def do_action(self, action):
         """
@@ -46,8 +45,8 @@ class GameState:
         return GameState(self.model, self.tokenizer, self.sequence.copy(), self.temperature, self.top_k)
 
     def get_result(self, player_to_move):
-        """
-        Compute and return the game result. Placeholder for a more sophisticated result evaluation.
-        """
-        # Simplified result computation. In practice, you'll need a meaningful way to evaluate the outcome.
-        return 1 if True else 0
+        # Example of using a value model to compute the result
+        # Assuming a separate value model that estimates the state value
+        state_value = self.value_model(torch.tensor([self.sequence], dtype=torch.long, device=self.value_model.device))
+        return state_value.item()
+
