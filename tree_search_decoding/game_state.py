@@ -16,7 +16,7 @@ class GameState:
         self.temperature = temperature
         self.top_k = top_k
         self.policy_model = policy_model
-        self.value_model = value_models
+        self.value_model = value_model
 
     def get_legal_actions(self):
         with torch.no_grad():
