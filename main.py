@@ -159,7 +159,7 @@ def demo(
 
     res, _logprobs, detailed_logprobs = generate(
         [
-            "Question: Sherrie tells the truth. Vernell says Sherrie tells the truth. Alexis says Vernell lies. Michaela says Alexis tells the truth. Elanor says Michaela tells the truth. Does Elanor tell the truth?\nAnswer: I will think through this step by step. ",
+            "Question: Osvaldo lies. Phoebe says Osvaldo lies. Kandi says Phoebe tells the truth. Crista says Kandi tells the truth. Delbert says Crista lies. Does Delbert tell the truth?\nAnswer: I will think through this step by step and give a definitive answer. ",
         ],
         transformer,
         tokenizer,
