@@ -1,7 +1,10 @@
 import torch
 
+from policy_model import PolicyModel
+from value_model import ValueModel
+
 class GameState:
-    def __init__(self, model, policy_model, value_model, tokenizer, sequence, temperature=0.7, top_k=5):
+    def __init__(self, model, policy_model: PolicyModel, value_model: ValueModel, tokenizer, sequence, temperature=0.7, top_k=5):
         """
         Initialize the game state.
         :param model: The transformer model used for generating text.
@@ -21,7 +24,7 @@ class GameState:
     def get_legal_actions(self):
         with torch.no_grad():
             inputs = torch.tensor([self.sequence], dtype=torch.long, device=self.policy_model.device)
-            action_probs = self.policy_model(inputs)  # Assuming the policy model outputs a probability distribution over actions
+            action_probs = self.policy_model.predict(inputs)  # Assuming the policy model outputs a probability distribution over actions
             
             # You might still want to apply temperature scaling or other adjustments here
             action_probs = torch.softmax(action_probs / self.temperature, dim=-1)
