@@ -159,7 +159,7 @@ def demo(
 
     res, _logprobs, detailed_logprobs = generate(
         [
-            "Adam has 2 apples. Joe gave him an additional apple. Joe ate one of his apples. I will think through this problem step by step and arrive at an answer. My Solution: ",
+            "Question: Sherrie tells the truth. Vernell says Sherrie tells the truth. Alexis says Vernell lies. Michaela says Alexis tells the truth. Elanor says Michaela tells the truth. Does Elanor tell the truth?\nAnswer: ",
         ],
         transformer,
         tokenizer,
