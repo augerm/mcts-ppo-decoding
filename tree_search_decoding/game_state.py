@@ -27,7 +27,8 @@ class GameState:
     def get_legal_actions(self):
         # Select the top k actions based on the policy model's probabilities
         top_probs, top_indices = torch.topk(self.legal_actions, self.top_k, dim=-1)
-        if top_probs[0] > self.minimal_next_token_probability:
+        result = top_probs[0] > self.minimal_next_token_probability
+        if result[0]:
             return top_indices[0].cpu().tolist()
         else:
             return []
