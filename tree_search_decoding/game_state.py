@@ -20,6 +20,7 @@ class GameState:
         self.top_k = top_k
         self.policy_model = policy_model
         self.value_model = value_model
+        self.last_token_prelogits = last_token_prelogits
         self.legal_actions = torch.softmax(last_token_prelogits / temperature, dim=-1)
 
     def get_legal_actions(self):
@@ -37,7 +38,7 @@ class GameState:
         """
         Return a deep copy of the current game state.
         """
-        return GameState(self.model, self.tokenizer, self.sequence.copy(), self.temperature, self.top_k)
+        return GameState(self.model, self.tokenizer, self.sequence.copy(), self.temperature, self.top_k, self.last_token_prelogits)
 
     def get_result(self):
         # Example of using a value model to compute the result
