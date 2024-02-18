@@ -9,7 +9,6 @@ class MCTSNode:
         self.wins = 0
         self.visits = 0
         self.untried_actions = self.game_state.get_legal_actions()
-        self.player_to_move = self.game_state.player_to_move
 
     def ucb1_select_child(self):
         """Select a child node using UCB1 policy."""
@@ -55,7 +54,7 @@ def mcts(root_state, iterations):
 
         # Backpropagation
         while node is not None:
-            node.update(state.get_result(node.player_to_move))  # backpropagate from the expanded node and work back to the root node
+            node.update(state.get_result())  # backpropagate from the expanded node and work back to the root node
             node = node.parent
 
     return max(root_node.children, key=lambda c: c.visits).game_state  # return the move that was most visited
