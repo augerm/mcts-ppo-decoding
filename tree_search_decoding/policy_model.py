@@ -16,5 +16,5 @@ class PolicyModel:
     # inputs = torch.tensor([self.sequence], dtype=torch.long, device=self.policy_model.device)
     # Implement your policy model's prediction logic here
     # inputs = torch.tensor([self.sequence], dtype=torch.long, device=self.policy_model.device)
-    print(Warning('Policy model should be returning probability distributions, but not yet implemented!'))
+    # TODO: Policy model should be returning probability distributions, but not yet implemented!
     return game_state.get_legal_actions()
