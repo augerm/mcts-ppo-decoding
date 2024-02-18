@@ -1,8 +1,6 @@
 import random
 import torch
 
-from tree_search_decoding.game_state import GameState
-
 class PolicyModel:
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -10,7 +8,7 @@ class PolicyModel:
     # Initialize your policy model here (e.g., neural network weights)
     pass
 
-  def predict(self, game_state: GameState):
+  def predict(self, game_state):
     """
     Predicts the best action to take in a given game state.
     This is a stub, replace with your own logic or model.
