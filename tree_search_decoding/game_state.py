@@ -38,7 +38,7 @@ class GameState:
         """
         Return a deep copy of the current game state.
         """
-        return GameState(self.model, self.tokenizer, self.sequence.copy(), self.temperature, self.top_k, self.last_token_prelogits)
+        return GameState(self.model, self.policy_model, self.value_model, self.tokenizer, self.sequence.copy(), self.temperature, self.top_k, self.last_token_prelogits)
 
     def get_result(self):
         # Example of using a value model to compute the result
