@@ -1,7 +1,7 @@
 import torch
 
-from policy_model import PolicyModel
-from value_model import ValueModel
+from tree_search_decoding.policy_model import PolicyModel
+from tree_search_decoding.value_model import ValueModel
 
 class GameState:
     def __init__(self, model, policy_model: PolicyModel, value_model: ValueModel, tokenizer, sequence, temperature=0.7, top_k=5):
