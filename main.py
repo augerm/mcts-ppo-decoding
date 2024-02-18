@@ -163,7 +163,8 @@ def demo(
         max_tokens=max_tokens,
         temperature=temperature,
     )
-    print(f"Detailed Log Probs: \n{'\n'.join(detailed_logprobs.split('\n'))}\n")
+    newline = "\n"
+    print(f"Detailed Log Probs: {newline}{newline.join(detailed_logprobs.split(newline))}{newline}")
     if should_print:
         for x,l in zip(res, _logprobs):
             print(x)
