@@ -164,7 +164,7 @@ def demo(
         temperature=temperature,
     )
     newline = "\n"
-    print(f"Detailed Log Probs: {newline}{detailed_logprobs.split(newline)}{newline}")
+    print(f"Detailed Log Probs: {newline}{detailed_logprobs.join(newline)}{newline}")
     if should_print:
         for x,l in zip(res, _logprobs):
             print(x)
