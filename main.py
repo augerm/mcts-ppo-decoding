@@ -156,7 +156,7 @@ def demo(
 
     res, _logprobs, detailed_logprobs = generate(
         [
-            "Adam has 2 apples. Joe gave him an additional apple. Joe ate one of his apples. How many apples does Adam have? The answer is ",
+            "Adam has 2 apples. Joe gave him an additional apple. Joe ate one of his apples. I will think through this problem step by step and arrive at an answer. My Solution: ",
         ],
         transformer,
         tokenizer,
@@ -164,7 +164,12 @@ def demo(
         temperature=temperature,
     )
     newline = '\n'
-    print(f"Detailed Log Probs: {newline}{''.join([newline + str(item) for item in detailed_logprobs])}{newline}")
+    print("Detailed Log Probs:")
+    for item_list in detailed_logprobs:
+        for item in item_list:
+            print(f"{newline}{item[0]}: {item[1]}")
+        print(newline)
+
 
     if should_print:
         for x,l in zip(res, _logprobs):
