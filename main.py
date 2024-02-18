@@ -91,12 +91,22 @@ def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, ma
     # decode
     generated_tokens = []
     assert last_token_prelogits is not None
+    detailed_logprobs = [[] for _ in range(B)]  # For detailed logging
     for i_token in range(max_tokens):
         next_token = sample(last_token_prelogits, temperature=temperature, top_p=0.8)
 
         last_token_logits = torch.log_softmax(last_token_prelogits, dim=-1)
         for i in range(B):
             logprobs[i].append(last_token_logits[i, next_token[i]].item())
+            all_token_probs = torch.softmax(last_token_prelogits[i], dim=-1)
+            top_tokens = torch.topk(all_token_probs, k=10, dim=-1)
+            
+            decoded_tokens = [tokenizer.decode([token_id]) for token_id in top_tokens.indices.tolist()]
+            token_probs = top_tokens.values.tolist()
+            
+            # Store decoded tokens and their probabilities
+            detailed_log_entry = list(zip(decoded_tokens, token_probs))
+            detailed_logprobs[i].append(detailed_log_entry)
 
         generated_tokens.append(next_token[:, None])
         last_token_prelogits = model.forward(next_token, seqlens=[1] * len(prompts), cache=cache)
@@ -108,7 +118,7 @@ def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, ma
         for i, x in enumerate(encoded_prompts):
             generated_words.append(tokenizer.decode(x + generated_tokens[i].tolist()))
 
-    return generated_words, logprobs
+    return generated_words, logprobs, detailed_logprobs
 
 
 def interactive(model_path: str, max_tokens: int = 35, temperature: float = 0.7, instruct: bool = False):
@@ -144,11 +154,9 @@ def demo(
         Path(model_path), max_batch_size=3, num_pipeline_ranks=num_pipeline_ranks
     )
 
-    res, _logprobs = generate(
+    res, _logprobs, detailed_logprobs = generate(
         [
-            "This is a test",
-            "This is another great test",
-            "This is a third test, mistral AI is very good at testing. ",
+            "Adam has 2 apples. Joe gave him an additional apple. Joe ate one of his apples. How many apples does Adam have? The answer is ",
         ],
         transformer,
         tokenizer,
