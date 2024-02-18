@@ -13,6 +13,8 @@ class PolicyModel:
     Predicts the best action to take in a given game state.
     This is a stub, replace with your own logic or model.
     """
+    # inputs = torch.tensor([self.sequence], dtype=torch.long, device=self.policy_model.device)
     # Implement your policy model's prediction logic here
+    # inputs = torch.tensor([self.sequence], dtype=torch.long, device=self.policy_model.device)
     print(Warning('Policy model should be returning probability distributions, but not yet implemented!'))
     return game_state.get_legal_actions()

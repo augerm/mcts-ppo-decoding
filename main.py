@@ -104,7 +104,7 @@ def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, ma
     for i_token in range(max_tokens):
         next_token = None
         if use_mcts_decoding:
-            game_state = GameState(model, policy_model, value_model, tokenizer, generated_tokens)
+            game_state = GameState(model, policy_model, value_model, tokenizer, generated_tokens, last_token_prelogits)
             next_token = mcts(game_state, iterations = 1)
         else:
             next_token = sample(last_token_prelogits, temperature=temperature, top_p=0.8)
