@@ -9,8 +9,8 @@ from mistral.model import Transformer
 from mistral.tokenizer import Tokenizer
 from tree_search_decoding.mcts import mcts
 from tree_search_decoding.game_state import GameState
-from .tree_search_decoding.policy_model import PolicyModel
-from .tree_search_decoding.value_model import ValueModel
+from tree_search_decoding.policy_model import PolicyModel
+from tree_search_decoding.value_model import ValueModel
 
 
 def sample_top_p(probs: torch.Tensor, p: float):
