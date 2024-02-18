@@ -4,7 +4,7 @@ from tree_search_decoding.policy_model import PolicyModel
 from tree_search_decoding.value_model import ValueModel
 
 class GameState:
-    def __init__(self, model, policy_model: PolicyModel, value_model: ValueModel, tokenizer, sequence, last_token_prelogits, temperature=0.7, top_k=5):
+    def __init__(self, model, policy_model: PolicyModel, value_model: ValueModel, tokenizer, sequence, last_token_prelogits, temperature=0.7, top_k=5, minimal_next_token_probability = 0.1):
         """
         Initialize the game state.
         :param model: The transformer model used for generating text.
@@ -22,11 +22,15 @@ class GameState:
         self.value_model = value_model
         self.last_token_prelogits = last_token_prelogits
         self.legal_actions = torch.softmax(last_token_prelogits / temperature, dim=-1)
+        self.minimal_next_token_probability = minimal_next_token_probability
 
     def get_legal_actions(self):
         # Select the top k actions based on the policy model's probabilities
         top_probs, top_indices = torch.topk(self.legal_actions, self.top_k, dim=-1)
-        return top_indices[0].cpu().tolist()
+        if top_probs[0] > self.minimal_next_token_probability:
+            return top_indices[0].cpu().tolist()
+        else:
+            return []
 
     def do_action(self, action):
         """
