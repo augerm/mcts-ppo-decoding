@@ -9,6 +9,8 @@ from mistral.model import Transformer
 from mistral.tokenizer import Tokenizer
 from tree_search_decoding.mcts import mcts
 from tree_search_decoding.game_state import GameState
+from .tree_search_decoding.policy_model import PolicyModel
+from .tree_search_decoding.value_model import ValueModel
 
 
 def sample_top_p(probs: torch.Tensor, p: float):
@@ -32,10 +34,15 @@ def sample(logits: torch.Tensor, temperature: float, top_p: float):
 
     return next_token.reshape(-1)
 
+# def find_best_token(logits: torch.Tensor, temperature: float, top_p: float):
+#     game_state
+#     pass
 
 @torch.inference_mode()
 def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, max_tokens: int,  temperature: float, chunk_size: int = None, use_mcts_decoding: bool = False):
     model = model.eval()
+    value_model = ValueModel()
+    policy_model = PolicyModel()
     B, V = len(prompts), model.args.vocab_size
 
     # Tokenize
@@ -95,7 +102,12 @@ def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, ma
     assert last_token_prelogits is not None
     detailed_logprobs = [[] for _ in range(B)]  # For detailed logging
     for i_token in range(max_tokens):
-        next_token = sample(last_token_prelogits, temperature=temperature, top_p=0.8)
+        next_token = None
+        if use_mcts_decoding:
+            game_state = GameState(model, policy_model, value_model, tokenizer, generated_tokens)
+            next_token = mcts(game_state, iterations = 1)
+        else:
+            next_token = sample(last_token_prelogits, temperature=temperature, top_p=0.8)
 
         last_token_logits = torch.log_softmax(last_token_prelogits, dim=-1)
         for i in range(B):

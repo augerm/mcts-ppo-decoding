@@ -49,7 +49,8 @@ def mcts(root_state, iterations):
 
         # Simulation
         while state.get_legal_actions() != []:  # while state is non-terminal
-            state.do_action(random.choice(state.get_legal_actions()))
+            action = state.policy_model.predict(state)
+            state.do_action(action)
 
         # Backpropagation
         while node is not None:

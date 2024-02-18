@@ -16,8 +16,7 @@ class GameState:
         self.temperature = temperature
         self.top_k = top_k
         self.policy_model = policy_model
-        self.value_model = value_model
-        self.player_to_move = 1  # Assuming a single-player setup
+        self.value_model = value_models
 
     def get_legal_actions(self):
         with torch.no_grad():
@@ -44,9 +43,8 @@ class GameState:
         """
         return GameState(self.model, self.tokenizer, self.sequence.copy(), self.temperature, self.top_k)
 
-    def get_result(self, player_to_move):
+    def get_result(self):
         # Example of using a value model to compute the result
         # Assuming a separate value model that estimates the state value
-        state_value = self.value_model(torch.tensor([self.sequence], dtype=torch.long, device=self.value_model.device))
+        state_value = self.value_model.evaluate(self)
         return state_value.item()
-
