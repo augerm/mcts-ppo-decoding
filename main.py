@@ -97,7 +97,7 @@ def generate(prompts: List[str], model: Transformer, tokenizer: Tokenizer, *, ma
         next_token = None
         if use_mcts_decoding:
             transformer_state = TransformerState(model, last_token_prelogits, seqlens=[1] * len(prompts))
-            mcts = MCTS(time_limit=60)
+            mcts = MCTS(timeLimit=60)
             next_token = mcts.search(transformer_state, True)
         else:
             next_token = sample(last_token_prelogits, temperature=temperature, top_p=0.8)
