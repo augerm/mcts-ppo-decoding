@@ -1,15 +1,15 @@
+from typing import List
 import torch
 
 class TransformerState():
-    def __init__(self, model, x, freqs_cis, cache=None, p=0.9, min_prob_threshold=0.01):
+    def __init__(self, model, x, seqlens: List[int], p=0.9, min_prob_threshold=0.01):
         """
         Initialize the state with the necessary components for making predictions,
         including the nucleus sampling threshold p.
         """
         self.model = model
         self.x = x  # The current sequence of tokens (as a tensor)
-        self.freqs_cis = freqs_cis
-        self.cache = cache
+        self.seqlens = seqlens
         self.p = p
         self.min_prob_threshold = min_prob_threshold
 
@@ -27,7 +27,7 @@ class TransformerState():
         Uses the model's forward pass to predict the next set of possible actions,
         applying nucleus sampling to select a subset based on the cumulative probability threshold.
         """
-        logits = self.model.forward(self.x, self.freqs_cis, self.cache)
+        logits = self.model.forward(self.x, seqlens=self.seqlens)
         probabilities = torch.softmax(logits[-1], dim=-1)  # Focus on the last set of logits for the current step
 
         # Sort the probabilities in descending order and compute the cumulative probabilities
@@ -65,12 +65,12 @@ class TransformerState():
 
         # Create a new TransformerState with the updated sequence.
         # Note: You might need to update `freqs_cis` and `cache` as appropriate for your model.
-        new_state = TransformerState(self.model, new_x, self.freqs_cis, self.cache, self.p)
+        new_state = TransformerState(self.model, new_x, seqlens=self.seqlens, p=self.p)
         
         return new_state
 
     def isTerminal(self):
-        logits = self.model.forward(self.x, self.freqs_cis, self.cache)
+        logits = self.model.forward(self.x, seqlens=self.seqlens)
         probabilities = torch.softmax(logits[-1], dim=-1)
         max_prob = torch.max(probabilities)
         # If the maximum probability among the next token predictions is below the threshold,
@@ -79,7 +79,7 @@ class TransformerState():
 
     def getReward(self):
         # Perform the model's forward pass to get the logits for the next possible tokens.
-        logits = self.model.forward(self.x, self.freqs_cis, self.cache)
+        logits = self.model.forward(self.x, seqlens=self.seqlens)
         probabilities = torch.softmax(logits[-1], dim=-1)  # Convert last logits to probabilities
 
         # Get the top two probabilities.

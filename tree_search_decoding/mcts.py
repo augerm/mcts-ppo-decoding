@@ -34,7 +34,7 @@ class treeNode():
         s.append("possibleActions: %s"%(self.children.keys()))
         return "%s: {%s}"%(self.__class__.__name__, ', '.join(s))
 
-class mcts():
+class MCTS():
     def __init__(self, timeLimit=None, iterationLimit=None, explorationConstant=1 / math.sqrt(2),
                  rolloutPolicy=randomPolicy):
         if timeLimit != None:

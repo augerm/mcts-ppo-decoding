@@ -63,6 +63,7 @@ class TestTransformerState(unittest.TestCase):
         # Case 1: Mock model to return probabilities indicating a non-terminal state
         mock_probabilities_non_terminal = torch.tensor([0.05, 0.15, 0.2, 0.4, 0.2])
         self.model_mock.forward.return_value = [torch.log_softmax(mock_probabilities_non_terminal, dim=-1)]
+        self.state.min_prob_threshold = 0.1
         self.assertFalse(self.state.isTerminal(), "State should not be terminal when max probability is above the threshold.")
 
         # Case 2: Mock model to return probabilities indicating a terminal state
